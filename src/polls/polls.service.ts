@@ -13,6 +13,7 @@ import {
   VotePollOptionQuery,
 } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { shuffleArray } from 'src/utils/shuffle-array';
 
 @Injectable()
 export class PollsService {
@@ -20,7 +21,8 @@ export class PollsService {
 
   async findAll() {
     const polls = await this.pollModel.find();
-    return { polls };
+    const newPolls = shuffleArray(polls);
+    return { polls: newPolls };
   }
 
   async findOne(params: FindPollParams) {
