@@ -13,6 +13,7 @@ import {
   ChangeUserNameParams,
   DeleteUserParams,
   FindUserParams,
+  FindUserWithTokenParams,
 } from './types';
 import { Poll } from 'src/polls/poll.schema';
 import * as bcrypt from 'bcrypt';
@@ -24,7 +25,7 @@ export class UsersService {
     @InjectModel(Poll.name) private pollModel: Model<Poll>,
   ) {}
 
-  async findOne(params: FindUserParams) {
+  async findOneWithPolls(params: FindUserParams) {
     const user = await this.userModel.findById(params.id, {
       authToken: false,
       password: false,
@@ -37,6 +38,55 @@ export class UsersService {
       throw new NotFoundException('No user found with the given id');
     }
 
+    return { user, polls };
+  }
+
+  async findOneWithoutPolls(params: FindUserParams) {
+    const user = await this.userModel.findById(params.id, {
+      authToken: false,
+      password: false,
+    });
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+
+    return { user };
+  }
+
+  async findOneMinimized(params: FindUserParams) {
+    const user = await this.userModel.findById(params.id, {
+      authToken: false,
+      email: false,
+      password: false,
+      bio: false,
+    });
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+
+    return { user };
+  }
+
+  async findOneWithToken(params: FindUserWithTokenParams) {
+    if (!params.authToken) return;
+    const user = await this.userModel.findOne(
+      {
+        authToken: params.authToken,
+      },
+      {
+        password: false,
+      },
+    );
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+
+    const polls = await this.pollModel.find({
+      userId: user._id,
+    });
     return { user, polls };
   }
 
@@ -54,6 +104,8 @@ export class UsersService {
       email: dto.email,
       password: await hashText(dto.password),
       fullName: dto.fullName,
+      avatar: 'user-avatar-default.svg',
+      bio: '',
     });
     await newUser.save();
     return {
