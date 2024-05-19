@@ -16,6 +16,9 @@ export class User extends Document {
   fullName: string;
 
   @Prop()
+  avatar: string;
+
+  @Prop()
   bio: string;
 }
 
