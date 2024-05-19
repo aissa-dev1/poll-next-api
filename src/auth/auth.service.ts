@@ -14,14 +14,17 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.usersService.findOneByEmail(dto.email);
-    const passwordMatch = await bcrypt.compare(dto.password, user.password);
 
-    if (!user || !passwordMatch) {
+    if (!user) {
       throw new NotFoundException('Invalid credentials');
     }
 
-    return {
-      authToken: user.authToken,
-    };
+    const passwordMatch = await bcrypt.compare(dto.password, user.password);
+
+    if (!passwordMatch) {
+      throw new NotFoundException('Invalid credentials');
+    }
+
+    return { authToken: user.authToken };
   }
 }
