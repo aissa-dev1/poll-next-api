@@ -5,6 +5,7 @@ import {
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +23,12 @@ async function bootstrap() {
       },
     }),
   );
+  const corsOptions: CorsOptions = {
+    origin: ['http://localhost:5173', 'http://localhost:4173'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  };
+  app.enableCors(corsOptions);
   await app.listen(3000);
 }
 bootstrap();
