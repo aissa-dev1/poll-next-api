@@ -40,7 +40,11 @@ export class AppModule implements NestModule {
     consumer
       .apply(VerifyAuthToken)
       .exclude(
-        { path: 'users/:id', method: RequestMethod.GET },
+        { path: 'auth/register', method: RequestMethod.POST },
+        { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'users/:id/with-polls', method: RequestMethod.GET },
+        { path: 'users/:id/without-polls', method: RequestMethod.GET },
+        { path: 'users/:id/minimized', method: RequestMethod.GET },
         { path: 'polls', method: RequestMethod.GET },
         { path: 'polls/:id', method: RequestMethod.GET },
       )
