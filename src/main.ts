@@ -24,7 +24,11 @@ async function bootstrap() {
     }),
   );
   const corsOptions: CorsOptions = {
-    origin: ['http://localhost:5173', 'http://localhost:4173'],
+    origin: [
+      'https://poll-next.netlify.app',
+      'http://localhost:5173',
+      'http://localhost:4173',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
