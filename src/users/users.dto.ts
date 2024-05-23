@@ -1,29 +1,46 @@
-import { IsNotEmpty, IsEmail, Length, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
+import { IsPassword } from 'src/decorators/is-password';
+import { IsValidEmail } from 'src/decorators/is-valid-email';
+import { IsValidInput } from 'src/decorators/is-valid-input';
 
 export class CreateUserDto {
-  @IsNotEmpty({ message: 'Email is required' })
-  @IsEmail({}, { message: 'Invalid email format' })
+  @IsValidEmail()
   email: string;
 
-  @IsNotEmpty({ message: 'Password is required' })
-  @Length(4, 20, { message: 'Password must be 4-20 characters long' })
+  @IsPassword()
   password: string;
 
-  @IsNotEmpty({ message: 'Full name is required' })
-  @IsString({ message: 'Full name must be a string' })
-  @Length(2, 50, { message: 'Full name must be 2-50 characters long' })
+  @IsValidInput('Full name')
   fullName: string;
 }
 
 export class ChangeUserNameDto {
-  @IsNotEmpty({ message: 'Full name is required' })
-  @IsString({ message: 'Full name must be a string' })
-  @Length(2, 50, { message: 'Full name must be 2-50 characters long' })
+  @IsValidInput('Full name')
   fullName: string;
 }
 
+export class ChangeUserAvatarDto {
+  @IsValidInput('Avatar')
+  avatar: string;
+}
+
+export class ChangeUserBioDto {
+  @IsString({ message: 'Bio must be a string' })
+  bio: string;
+}
+
+export class ChangeUserPasswordDto {
+  @IsPassword('Current Password')
+  currentPassword: string;
+
+  @IsPassword('New Password')
+  newPassword: string;
+
+  @IsPassword('r-new Password')
+  rnewPassword: string;
+}
+
 export class DeleteUserDto {
-  @IsNotEmpty({ message: 'Password is required' })
-  @Length(4, 20, { message: 'Password must be 4-20 characters long' })
+  @IsPassword()
   password: string;
 }
