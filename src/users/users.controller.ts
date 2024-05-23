@@ -1,12 +1,21 @@
 import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
+  ChangeUserAvatarParams,
+  ChangeUserBioParams,
   ChangeUserNameParams,
+  ChangeUserPasswordParams,
   DeleteUserParams,
   FindUserParams,
   FindUserWithTokenParams,
 } from './types';
-import { ChangeUserNameDto, DeleteUserDto } from './users.dto';
+import {
+  ChangeUserAvatarDto,
+  ChangeUserBioDto,
+  ChangeUserNameDto,
+  ChangeUserPasswordDto,
+  DeleteUserDto,
+} from './users.dto';
 
 @Controller('users')
 export class UsersController {
@@ -38,6 +47,30 @@ export class UsersController {
     @Param() params: ChangeUserNameParams,
   ) {
     return this.usersService.changeName(dto, params);
+  }
+
+  @Patch('change-avatar/:id')
+  async changeAvatar(
+    @Body() dto: ChangeUserAvatarDto,
+    @Param() params: ChangeUserAvatarParams,
+  ) {
+    return this.usersService.changeAvatar(dto, params);
+  }
+
+  @Patch('change-bio/:id')
+  async changeBio(
+    @Body() dto: ChangeUserBioDto,
+    @Param() params: ChangeUserBioParams,
+  ) {
+    return this.usersService.changeBio(dto, params);
+  }
+
+  @Patch('change-password/:id')
+  async changePassword(
+    @Body() dto: ChangeUserPasswordDto,
+    @Param() params: ChangeUserPasswordParams,
+  ) {
+    return this.usersService.changePassword(dto, params);
   }
 
   @Delete(':id')
