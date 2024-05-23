@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,11 +7,21 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Model } from 'mongoose';
-import { ChangeUserNameDto, CreateUserDto, DeleteUserDto } from './users.dto';
+import {
+  ChangeUserAvatarDto,
+  ChangeUserBioDto,
+  ChangeUserNameDto,
+  ChangeUserPasswordDto,
+  CreateUserDto,
+  DeleteUserDto,
+} from './users.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { hashText } from 'src/utils/hash-text';
 import {
+  ChangeUserAvatarParams,
+  ChangeUserBioParams,
   ChangeUserNameParams,
+  ChangeUserPasswordParams,
   DeleteUserParams,
   FindUserParams,
   FindUserWithTokenParams,
@@ -126,6 +137,62 @@ export class UsersService {
     return { message: `Your new name is ${dto.fullName}` };
   }
 
+  async changeAvatar(dto: ChangeUserAvatarDto, params: ChangeUserAvatarParams) {
+    const user = await this.findOneById(params.id);
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+
+    await user.updateOne({
+      avatar: dto.avatar,
+    });
+    return { message: 'Your avatar changed successfully' };
+  }
+
+  async changeBio(dto: ChangeUserBioDto, params: ChangeUserBioParams) {
+    const user = await this.findOneById(params.id);
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+
+    await user.updateOne({
+      bio: dto.bio,
+    });
+    return { message: 'Your bio changed successfully' };
+  }
+
+  async changePassword(
+    dto: ChangeUserPasswordDto,
+    params: ChangeUserPasswordParams,
+  ) {
+    const user = await this.findOneById(params.id);
+
+    if (!user) {
+      throw new NotFoundException('No user found with the given id');
+    }
+    if (dto.newPassword !== dto.rnewPassword) {
+      throw new BadRequestException(
+        'The new password must be similar to r-new password',
+      );
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      dto.currentPassword,
+      user.password,
+    );
+
+    if (!passwordMatch) {
+      throw new ForbiddenException('Incorrect password, try again');
+    }
+
+    await user.updateOne({
+      password: await hashText(dto.newPassword),
+    });
+    return { message: 'Your password changed successfully' };
+  }
+
   async deleteOne(dto: DeleteUserDto, params: DeleteUserParams) {
     const user = await this.findOneById(params.id);
     const passwordMatch = await bcrypt.compare(dto.password, user.password);
@@ -135,7 +202,7 @@ export class UsersService {
     }
     if (!passwordMatch) {
       throw new ForbiddenException(
-        "You don't have permission to delete this user",
+        "You don't have permission to delete this account",
       );
     }
 
