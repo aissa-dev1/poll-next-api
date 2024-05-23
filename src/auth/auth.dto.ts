@@ -1,11 +1,10 @@
-import { IsNotEmpty, IsEmail, Length } from 'class-validator';
+import { IsPassword } from 'src/decorators/is-password';
+import { IsValidEmail } from 'src/decorators/is-valid-email';
 
 export class LoginDto {
-  @IsNotEmpty({ message: 'Email is required' })
-  @IsEmail({}, { message: 'Invalid email format' })
+  @IsValidEmail()
   email: string;
 
-  @IsNotEmpty({ message: 'Password is required' })
-  @Length(4, 20, { message: 'Password must be 4-20 characters long' })
+  @IsPassword()
   password: string;
 }
